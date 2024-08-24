@@ -9,6 +9,7 @@
 #include <QValidator>
 #include <QFileInfo>
 #include <QRegularExpression>
+#include <QListWidgetItem>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -35,15 +36,20 @@ private slots:
     void on_initButton_clicked();
     void on_trainButton_clicked();
     void onProgressUpdated(int value);
-    void onTrainingFinished();
+    void onInputItemChanged(QListWidgetItem *item);
+
+    void on_epochInput_valueChanged(int arg1);
 
 private:
+    int maxEpochs = 10000;
     static QVector<unsigned> topology;
     QVector<double> inputValues;
     QVector<double> targetValues;
     QVector<double> resultValues;
     NNet neuralNetwork;
     Trainer* trainer;
+    void updateInputList();
+    void updateOutputList(const QVector<double> &outputValues);
     Ui::MainWindow *ui;
 };
 #endif // MAINWINDOW_H

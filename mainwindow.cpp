@@ -37,8 +37,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_trainDataPathEdit_returnPressed()
 {
+    QString message = "Input neurons: %1 | Hidden neurons: %2 | Output neurons: %3 | (%4): %5 train values: %6/%7";
+    if (header == "No header") message = "Input neurons: %1 | Hidden neurons: %2 | Output neurons: %3 | %4 train values: %5/%6";
     ui->statusbar->showMessage(
-        QString("Input neurons: %1 | Hidden neurons: %2 | Output neurons: %3 | (%4): %5 train values: %6/%7")
+        QString(message)
             .arg(topology[0])
             .arg(topology[1])
             .arg(topology[2])
@@ -66,16 +68,21 @@ void MainWindow::on_initButton_clicked()
     neuralNetwork = NNet(topology);
     ui->initButton->setEnabled(false);
     ui->NNinputs->setEnabled(false);
+    ui->IOfields->setEnabled(true);
+
+    updateInputList();
+    updateOutputList(QVector<double>(topology[2], 0.0));
+
+    connect(ui->inputList, &QListWidget::itemChanged, this, &MainWindow::onInputItemChanged);
 }
 
 void MainWindow::on_trainButton_clicked()
 {
-    int maxEpochs = 10000;
     trainer = new Trainer(neuralNetwork, inputValues, topology, this);
 
     connect(trainer, &Trainer::progressUpdated, this, &MainWindow::onProgressUpdated);
-    connect(trainer, &Trainer::trainingFinished, this, &MainWindow::onTrainingFinished);
 
+    ui->NNactions->setEnabled(false);
     trainer->startTraining(maxEpochs);
 }
 
@@ -84,27 +91,48 @@ void MainWindow::onProgressUpdated(int value)
     ui->trainProcess->setValue(value);
 }
 
-void MainWindow::onTrainingFinished()
+void MainWindow::updateInputList()
 {
-    ui->trainProcess->setValue(100);
-    qDebug() << "Training completed!";
-
-    QVector<double> resultValues;
-    neuralNetwork.feedForward({0, 0});
-    neuralNetwork.getResults(resultValues);
-    qDebug() << resultValues;
-
-    neuralNetwork.feedForward({0, 1});
-    neuralNetwork.getResults(resultValues);
-    qDebug() << resultValues;
-
-    neuralNetwork.feedForward({1, 0});
-    neuralNetwork.getResults(resultValues);
-    qDebug() << resultValues;
-
-    neuralNetwork.feedForward({1, 1});
-    neuralNetwork.getResults(resultValues);
-    qDebug() << resultValues;
-
-    trainer->deleteLater();
+    ui->inputList->clear();
+    for (unsigned i = 0; i < topology[0]; ++i) {
+        QListWidgetItem *item = new QListWidgetItem(QString::number(0.0), ui->inputList);
+        item->setFlags(item->flags() | Qt::ItemIsEditable);
+        ui->inputList->addItem(item);
+    }
 }
+
+void MainWindow::updateOutputList(const QVector<double> &outputValues)
+{
+    ui->outputList->clear();
+    for (double value : outputValues) {
+        QListWidgetItem *item = new QListWidgetItem(QString::number(value), ui->outputList);
+        ui->outputList->addItem(item);
+    }
+}
+
+void MainWindow::onInputItemChanged(QListWidgetItem *item)
+{
+    QVector<double> inputValues;
+    for (int i = 0; i < ui->inputList->count(); ++i) {
+        bool ok;
+        double value = ui->inputList->item(i)->text().toDouble(&ok);
+        if (ok) {
+            inputValues.push_back(value);
+        } else {
+            inputValues.push_back(0.0);
+            item->setText("0.0");
+        }
+    }
+
+    neuralNetwork.feedForward(inputValues);
+
+    QVector<double> outputValues;
+    neuralNetwork.getResults(outputValues);
+    updateOutputList(outputValues);
+}
+
+void MainWindow::on_epochInput_valueChanged(int value)
+{
+    maxEpochs = value;
+}
+
