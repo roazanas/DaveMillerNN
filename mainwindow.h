@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "nnet.h"
+#include "trainer.h"
 #include <QMainWindow>
 #include <QVector>
 #include <QFileDialog>
@@ -33,6 +34,8 @@ private slots:
     void onValuesValidated(const QList<double> &values);
     void on_initButton_clicked();
     void on_trainButton_clicked();
+    void onProgressUpdated(int value);
+    void onTrainingFinished();
 
 private:
     static QVector<unsigned> topology;
@@ -40,6 +43,7 @@ private:
     QVector<double> targetValues;
     QVector<double> resultValues;
     NNet neuralNetwork;
+    Trainer* trainer;
     Ui::MainWindow *ui;
 };
 #endif // MAINWINDOW_H

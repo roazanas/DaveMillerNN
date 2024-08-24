@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "filepathvalidator.h"
-#include "nnet.h"
 
 QVector<unsigned> MainWindow::topology{0, 1, 0};
 QString MainWindow::header = "No header";
@@ -39,11 +38,14 @@ MainWindow::~MainWindow()
 void MainWindow::on_trainDataPathEdit_returnPressed()
 {
     ui->statusbar->showMessage(
-        QString("(%4): Input neurons: %1 | Hidden neurons: %2 | Output neurons: %3")
+        QString("Input neurons: %1 | Hidden neurons: %2 | Output neurons: %3 | (%4): %5 train values: %6/%7")
             .arg(topology[0])
             .arg(topology[1])
             .arg(topology[2])
-            .arg(header));
+            .arg(header)
+            .arg(inputValues.size())
+            .arg(inputValues.size() * (topology[0])/(topology[0]+topology[2]))
+            .arg(inputValues.size() * (topology[2])/(topology[0]+topology[2])));
     ui->NNactions->setEnabled(true);
 }
 
@@ -69,28 +71,40 @@ void MainWindow::on_initButton_clicked()
 void MainWindow::on_trainButton_clicked()
 {
     int maxEpochs = 10000;
-    for (int epoch = 0; epoch < maxEpochs; ++epoch) {
-        for (int i = 0; i < inputValues.size(); i += topology[0]+topology[2]) {
-            QVector<double> dataPoint = inputValues.sliced(i, topology[0]+topology[2]);
-            QVector<double> input = dataPoint.sliced(0, topology[0]);
-            QVector<double> target = dataPoint.sliced(topology[0], topology[2]);
-            neuralNetwork.feedForward(input);
-            neuralNetwork.backProp(target);
-        }
-        ui->trainProcess->setValue((epoch+1) / maxEpochs * 100);
-        QCoreApplication::processEvents();
-    }
-    neuralNetwork.feedForward(QVector<double>{0, 0});
-    neuralNetwork.getResults(resultValues);
-    qDebug() << resultValues;
-    neuralNetwork.feedForward(QVector<double>{0, 1});
-    neuralNetwork.getResults(resultValues);
-    qDebug() << resultValues;
-    neuralNetwork.feedForward(QVector<double>{1, 0});
-    neuralNetwork.getResults(resultValues);
-    qDebug() << resultValues;
-    neuralNetwork.feedForward(QVector<double>{1, 1});
-    neuralNetwork.getResults(resultValues);
-    qDebug() << resultValues;
+    trainer = new Trainer(neuralNetwork, inputValues, topology, this);
+
+    connect(trainer, &Trainer::progressUpdated, this, &MainWindow::onProgressUpdated);
+    connect(trainer, &Trainer::trainingFinished, this, &MainWindow::onTrainingFinished);
+
+    trainer->startTraining(maxEpochs);
 }
 
+void MainWindow::onProgressUpdated(int value)
+{
+    ui->trainProcess->setValue(value);
+}
+
+void MainWindow::onTrainingFinished()
+{
+    ui->trainProcess->setValue(100);
+    qDebug() << "Training completed!";
+
+    QVector<double> resultValues;
+    neuralNetwork.feedForward({0, 0});
+    neuralNetwork.getResults(resultValues);
+    qDebug() << resultValues;
+
+    neuralNetwork.feedForward({0, 1});
+    neuralNetwork.getResults(resultValues);
+    qDebug() << resultValues;
+
+    neuralNetwork.feedForward({1, 0});
+    neuralNetwork.getResults(resultValues);
+    qDebug() << resultValues;
+
+    neuralNetwork.feedForward({1, 1});
+    neuralNetwork.getResults(resultValues);
+    qDebug() << resultValues;
+
+    trainer->deleteLater();
+}

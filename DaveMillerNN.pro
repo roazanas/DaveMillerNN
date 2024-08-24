@@ -13,13 +13,15 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     neuron.cpp \
-    nnet.cpp
+    nnet.cpp \
+    trainer.cpp
 
 HEADERS += \
     filepathvalidator.h \
     mainwindow.h \
     neuron.h \
-    nnet.h
+    nnet.h \
+    trainer.h
 
 FORMS += \
     mainwindow.ui
