@@ -93,6 +93,7 @@ void MainWindow::on_trainButton_clicked()
 void MainWindow::onProgressUpdated(int value)
 {
     ui->trainProcess->setValue(value);
+    QCoreApplication::processEvents();
 }
 
 void MainWindow::updateInputList()
