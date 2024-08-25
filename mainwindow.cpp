@@ -5,17 +5,15 @@
 QVector<unsigned> MainWindow::topology{0, 1, 0};
 QString MainWindow::header = "No header";
 
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
-    neuralNetwork(topology)
-    , ui(new Ui::MainWindow)
+    neuralNetwork(topology),
+    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     FilePathValidator* validator = new FilePathValidator(ui->trainDataPathEdit);
     ui->trainDataPathEdit->setValidator(validator);
     connect(validator, &FilePathValidator::valuesValidated, this, &MainWindow::onValuesValidated);
-
 }
 
 void MainWindow::on_trainDataPathButton_clicked()
@@ -36,6 +34,11 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::on_trainDataPathEdit_returnPressed()
+{
+    updateStatusBar();
+}
+
+void MainWindow::updateStatusBar()
 {
     QString message = "Input neurons: %1 | Hidden neurons: %2 | Output neurons: %3 | (%4): %5 train values: %6/%7";
     if (header == "No header") message = "Input neurons: %1 | Hidden neurons: %2 | Output neurons: %3 | %4 train values: %5/%6";
@@ -61,6 +64,7 @@ void MainWindow::on_hiddenNeuronCount_valueChanged(int count)
 void MainWindow::onValuesValidated(const QList<double>& values)
 {
     inputValues = values;
+    updateStatusBar();
 }
 
 void MainWindow::on_initButton_clicked()
@@ -135,4 +139,3 @@ void MainWindow::on_epochInput_valueChanged(int value)
 {
     maxEpochs = value;
 }
-

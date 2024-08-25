@@ -22,7 +22,7 @@ QValidator::State FilePathValidator::validate(QString &input, int &pos) const
     QString firstLine = in.readLine();
 
     while (firstLine.isEmpty() || !firstLine.startsWith("Inputs: ")) {
-        if (!firstLine.isEmpty() && firstLine[0] == '#') MainWindow::header = firstLine.removeFirst().trimmed();
+        if (!firstLine.isEmpty() && firstLine[0] == '#') MainWindow::header = firstLine.mid(1).trimmed();
         firstLine = in.readLine();
     }
 
@@ -47,7 +47,7 @@ QValidator::State FilePathValidator::validate(QString &input, int &pos) const
 
     bool ok;
     QList<double> dValues;
-    foreach (const QString &value, values) {
+    for (const QString &value : values) {
         dValues.append(value.toDouble(&ok));
         if (!ok) {
             return Intermediate;

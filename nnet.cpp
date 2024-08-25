@@ -12,15 +12,10 @@ NNet::NNet(const QVector<unsigned int> &topology)
 
         for (unsigned iNeuron = 0; iNeuron < topology[iLayer]; ++iNeuron) {
             m_layers.back().push_back(Neuron(numOutputs, iNeuron));
-            // qDebug() <<
-            //     "NNet::NNet() | neuron created "
-            //             "(" << iLayer << iNeuron << ")";
+            m_layers.back().back().setOutputVal(1.0);
         }
-        m_layers.back().back().setOutputVal(1.0);
     }
-    qDebug() <<
-        "NNet::NNet() | neural network init "
-                "(" << topology << ")";
+    qDebug() << "NNet::NNet() | neural network init " << topology;
 }
 
 void NNet::feedForward(const QVector<double> &inputValues)
@@ -52,7 +47,7 @@ void NNet::backProp(const QVector<double> &targetValues)
 
     m_recentAverageError =
         (m_recentAverageError * m_recentAverageSmoothingFactor + m_error)
-                           / (m_recentAverageSmoothingFactor + 1.0);
+        / (m_recentAverageSmoothingFactor + 1.0);
 
     for (unsigned n = 0; n < outputLayer.size(); ++n) {
         outputLayer[n].calcOutputGradients(targetValues[n]);
@@ -71,7 +66,7 @@ void NNet::backProp(const QVector<double> &targetValues)
         Layer &layer = m_layers[iLayer];
         Layer &prevLayer = m_layers[iLayer-1];
 
-        for (unsigned n = 0; n < layer.size() - 1; ++n) {
+        for (unsigned n = 0; n < layer.size(); ++n) {
             layer[n].updateInputWeights(prevLayer);
         }
     }

@@ -51,5 +51,6 @@ private:
     void updateInputList();
     void updateOutputList(const QVector<double> &outputValues);
     Ui::MainWindow *ui;
+    void updateStatusBar();
 };
 #endif // MAINWINDOW_H
