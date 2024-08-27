@@ -20,7 +20,7 @@ void MainWindow::on_trainDataPathButton_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Choose text file"),
                                                     QString(),
-                                                    tr("*.*"));
+                                                    "*.*");
     if (!fileName.isEmpty())
     {
         ui->trainDataPathEdit->setText(fileName);
@@ -36,12 +36,13 @@ MainWindow::~MainWindow()
 void MainWindow::on_trainDataPathEdit_returnPressed()
 {
     updateStatusBar();
+    ui->initButton->setEnabled(true);
 }
 
 void MainWindow::updateStatusBar()
 {
-    QString message = "Input neurons: %1 | Hidden neurons: %2 | Output neurons: %3 | (%4): %5 train values: %6/%7";
-    if (header == "No header") message = "Input neurons: %1 | Hidden neurons: %2 | Output neurons: %3 | %4 train values: %5/%6";
+    QString message = tr("Input neurons: %1 | Hidden neurons: %2 | Output neurons: %3 | (%4): %5 train values: %6/%7");
+    if (header == "No header") message = tr("Input neurons: %1 | Hidden neurons: %2 | Output neurons: %3 | %4 train values: %5/%6");
     ui->statusbar->showMessage(
         QString(message)
             .arg(topology[0])
@@ -51,7 +52,6 @@ void MainWindow::updateStatusBar()
             .arg(inputValues.size())
             .arg(inputValues.size() * (topology[0])/(topology[0]+topology[2]))
             .arg(inputValues.size() * (topology[2])/(topology[0]+topology[2])));
-    ui->NNactions->setEnabled(true);
 }
 
 void MainWindow::on_hiddenNeuronCount_valueChanged(int count)
@@ -71,6 +71,7 @@ void MainWindow::on_initButton_clicked()
 {
     neuralNetwork = NNet(topology);
     ui->initButton->setEnabled(false);
+    ui->trainButton->setEnabled(true);
     ui->NNinputs->setEnabled(false);
     ui->IOfields->setEnabled(true);
 

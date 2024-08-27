@@ -10,6 +10,7 @@
 #include <QFileInfo>
 #include <QRegularExpression>
 #include <QListWidgetItem>
+#include <QPropertyAnimation>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {

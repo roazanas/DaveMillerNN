@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>translations/DaveMillerNN_ru.qm</file>
+        <file>icon.ico</file>
+    </qresource>
+</RCC>

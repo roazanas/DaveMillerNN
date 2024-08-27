@@ -15,7 +15,6 @@ NNet::NNet(const QVector<unsigned int> &topology)
             m_layers.back().back().setOutputVal(1.0);
         }
     }
-    qDebug() << "NNet::NNet() | neural network init " << topology;
 }
 
 void NNet::feedForward(const QVector<double> &inputValues)
