@@ -41,17 +41,30 @@ void MainWindow::on_trainDataPathEdit_returnPressed()
 
 void MainWindow::updateStatusBar()
 {
-    QString message = tr("Input neurons: %1 | Hidden neurons: %2 | Output neurons: %3 | (%4): %5 train values: %6/%7");
-    if (header == "No header") message = tr("Input neurons: %1 | Hidden neurons: %2 | Output neurons: %3 | %4 train values: %5/%6");
-    ui->statusbar->showMessage(
-        QString(message)
-            .arg(topology[0])
-            .arg(topology[1])
-            .arg(topology[2])
-            .arg(header)
-            .arg(inputValues.size())
-            .arg(inputValues.size() * (topology[0])/(topology[0]+topology[2]))
-            .arg(inputValues.size() * (topology[2])/(topology[0]+topology[2])));
+    QString message;
+    if (header == "No header") {
+        message = tr("Input neurons: %1 | Hidden neurons: %2 | Output neurons: %3 | %4 train values: %5/%6");
+        ui->statusbar->showMessage(
+            QString(message)
+                .arg(topology[0])
+                .arg(topology[1])
+                .arg(topology[2])
+                .arg(inputValues.size())
+                .arg(inputValues.size() * (topology[0])/(topology[0]+topology[2]))
+                .arg(inputValues.size() * (topology[2])/(topology[0]+topology[2])));
+    } else {
+        message = tr("Input neurons: %1 | Hidden neurons: %2 | Output neurons: %3 | (%4): %5 train values: %6/%7");
+        ui->statusbar->showMessage(
+            QString(message)
+                .arg(topology[0])
+                .arg(topology[1])
+                .arg(topology[2])
+                .arg(header)
+                .arg(inputValues.size())
+                .arg(inputValues.size() * (topology[0])/(topology[0]+topology[2]))
+                .arg(inputValues.size() * (topology[2])/(topology[0]+topology[2])));
+    }
+
 }
 
 void MainWindow::on_hiddenNeuronCount_valueChanged(int count)
